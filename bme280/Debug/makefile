@@ -35,34 +35,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := bme280
+BUILD_ARTIFACT_NAME := bme280_I2C
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-bme280.elf \
+bme280_I2C.elf \
 
 MAP_FILES += \
-bme280.map \
+bme280_I2C.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-bme280.list \
+bme280_I2C.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: bme280.elf secondary-outputs
+main-build: bme280_I2C.elf secondary-outputs
 
 # Tool invocations
-bme280.elf bme280.map: $(OBJS) $(USER_OBJS) /home/christopher/Documents/github/TEL320/bme280/STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "bme280.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/christopher/Documents/github/TEL320/bme280/STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bme280.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+bme280_I2C.elf bme280_I2C.map: $(OBJS) $(USER_OBJS) C:\Users\chris\Documents\github\TEL320\bme280\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "bme280_I2C.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\chris\Documents\github\TEL320\bme280\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bme280_I2C.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,14 +71,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-bme280.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "bme280.list"
+bme280_I2C.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "bme280_I2C.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) bme280.elf bme280.list bme280.map default.size.stdout
+	-$(RM) bme280_I2C.elf bme280_I2C.list bme280_I2C.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
