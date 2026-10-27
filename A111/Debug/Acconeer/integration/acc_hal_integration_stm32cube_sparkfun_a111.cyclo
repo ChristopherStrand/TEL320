@@ -1,0 +1,8 @@
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:46:20:disable_interrupts	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:52:20:enable_interrupts	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:77:13:acc_hal_integration_sensor_transfer	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:117:13:acc_hal_integration_sensor_power_on	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:129:13:acc_hal_integration_sensor_power_off	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:142:13:acc_hal_integration_wait_for_sensor_interrupt	4
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:166:14:acc_hal_integration_get_reference_frequency	1
+../Acconeer/integration/acc_hal_integration_stm32cube_sparkfun_a111.c:194:18:acc_hal_integration_get_implementation	1

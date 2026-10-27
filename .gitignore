@@ -7,6 +7,7 @@
 # Libraries
 *.lib
 *.a
+!A111/Acconeer/rss/lib/*.a
 *.la
 *.lo
 
