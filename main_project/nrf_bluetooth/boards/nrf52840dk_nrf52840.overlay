@@ -1,0 +1,19 @@
+/*
+ * UART link to the STM32 (USART1, 115200 8N1).
+ * uart0 stays as the console over the DK's USB (J-Link VCOM).
+ *
+ * Wiring (default uart1 pins on the nRF52840 DK):
+ *   STM32 PA9  (USART1_TX) -> nRF P1.01 (UART1 RX)
+ *   STM32 PA10 (USART1_RX) <- nRF P1.02 (UART1 TX)  (optional, not used yet)
+ *   STM32 GND              -- nRF GND
+ */
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+};
+
+/ {
+	chosen {
+		nordic,stm32-uart = &uart1;
+	};
+};

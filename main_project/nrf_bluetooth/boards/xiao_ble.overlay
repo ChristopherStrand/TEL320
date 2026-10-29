@@ -1,0 +1,19 @@
+/*
+ * UART link to the STM32 (USART1, 115200 8N1).
+ * The console/log goes over USB (CDC ACM), so uart0 is free for the STM32.
+ *
+ * Wiring (default uart0 pins on the XIAO nRF52840):
+ *   STM32 PA9  (USART1_TX) -> XIAO D7 / P1.12 (UART0 RX)
+ *   STM32 PA10 (USART1_RX) <- XIAO D6 / P1.11 (UART0 TX)  (optional, not used yet)
+ *   STM32 GND              -- XIAO GND
+ */
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+};
+
+/ {
+	chosen {
+		nordic,stm32-uart = &uart0;
+	};
+};

@@ -1,0 +1,19 @@
+# Flash layout for the XIAO nRF52840 with the Adafruit UF2 bootloader.
+# Without this, the NCS Partition Manager links the app at 0x0, which
+# overlaps the bootloader's SoftDevice/MBR area, and the app never starts.
+softdevice_reserved:
+  address: 0x0
+  size: 0x27000
+  region: flash_primary
+app:
+  address: 0x27000
+  size: 0xc5000
+  region: flash_primary
+storage:
+  address: 0xec000
+  size: 0x8000
+  region: flash_primary
+adafruit_boot:
+  address: 0xf4000
+  size: 0xc000
+  region: flash_primary
