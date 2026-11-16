@@ -1,0 +1,9 @@
+[project]
+name = "main-project"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "adafruit-blinka-bleio>=4.1.2",
+    "adafruit-circuitpython-ble>=10.1.5",
+    "matplotlib>=3.11.2",
+]
