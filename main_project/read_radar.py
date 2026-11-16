@@ -1,24 +1,47 @@
-import asyncio
-from bleak import BleakClient, BleakScanner
+import time
+import matplotlib.pyplot as plt
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
 
 NAME = "TEL320_Radar"
-TX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 
 
-def got_data(sender, data):
-    distance, amplitude = data.decode().strip().split(",")
-    print(f"distance: {distance}mm  amplitude: {amplitude})")
+def main():
+    ble = BLERadio()
+
+    connection = None
+    while connection is None:
+        for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=5):
+            if UARTService in adv.services and adv.complete_name == NAME:
+                connection = ble.connect(adv)
+                break
+        ble.stop_scan()
+
+    uart = connection[UARTService]
+
+    times, distances = [], []
+    start = time.time()
+
+    plt.ion()
+    fig, ax = plt.subplots()
+    (line_plot,) = ax.plot([], [])
+    ax.set_xlabel("time (s)")
+    ax.set_ylabel("distance (mm)")
+
+    while connection.connected and plt.fignum_exists(fig.number):
+        line = uart.readline()
+        if line:
+            try:
+                distance, amplitude = line.decode().strip().split(",")
+                times.append(time.time() - start)
+                distances.append(int(distance))
+            except ValueError:
+                continue
+            line_plot.set_data(times, distances)
+            ax.relim()
+            ax.autoscale_view()
+        plt.pause(0.001)
 
 
-async def main():
-    device = await BleakScanner.find_device_by_name(NAME)
-    if device is None:
-        return
-
-    async with BleakClient(device) as client:
-        await client.start_notify(TX_UUID, got_data)
-        while client.is_connected:
-            await asyncio.sleep(1)
-
-
-asyncio.run(main())
+main()
