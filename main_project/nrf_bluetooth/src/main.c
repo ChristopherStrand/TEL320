@@ -4,7 +4,6 @@
 #include <zephyr/logging/log.h>
 #include <bluetooth/services/nus.h>
 
-LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 #define LINE_LEN 32
 
@@ -56,7 +55,6 @@ int main(void){
 
 	while (1) {
 		k_msgq_get(&lines, &line, K_FOREVER);
-		LOG_INF("STM32: %.*s", line.len - 1, line.text); 
 		bt_nus_send(NULL, line.text, line.len);
 	}
 }
