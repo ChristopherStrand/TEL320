@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <string.h>
 #include "acc_hal_integration.h"
 #include "acc_rss.h"
 #include "acc_service.h"
@@ -45,8 +46,12 @@ typedef enum {
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define START_M 0.2f
-#define LENGTH_M 0.5f
+#define LENGTH_M 1.8f  /* 0.2 m + 1.8 m = detects out to 2.0 m */
+#define DOWNSAMPLING 4 /* ~2 mm steps keeps the 1.8 m sweep (~940 points) within MAX_LEN */
 #define MAX_LEN 2048
+#define DETECT_RATIO 4.0f /* peak must be this many times the noise floor (tune on real drone) */
+#define CONFIRM_N 3       /* detections required ... */
+#define CONFIRM_M 5       /* ... within the last M sweeps (M <= 8) */
 #define LOG_LEN 1024
 /* USER CODE END PD */
 
@@ -67,6 +72,8 @@ volatile uint16_t peak_amplitude = 0;
 volatile uint32_t peak_distance_mm = 0;
 
 uint16_t envelope[MAX_LEN];
+uint16_t scratch[MAX_LEN];
+uint8_t detect_history = 0;
 acc_service_envelope_metadata_t radar_meta;
 acc_service_envelope_result_info_t radar_info;
 acc_service_handle_t radar_handle;
@@ -112,6 +119,7 @@ radar_state_t radar_init(void)
 
   acc_service_requested_start_set(config, START_M);
   acc_service_requested_length_set(config, LENGTH_M);
+  acc_service_envelope_downsampling_factor_set(config, DOWNSAMPLING);  acc_service_repetition_mode_streaming_set(config, 30.0f);
 
   radar_handle = acc_service_create(config);
   acc_service_envelope_configuration_destroy(&config);
@@ -142,6 +150,38 @@ void radar_restart(void)
   } while (radar_state != RADAR_RUNNING);
 }
 
+/* Median of the sweep = noise floor (a target only occupies a few points). */
+static uint16_t sweep_median(void)
+{
+  int n = radar_meta.data_length;
+  int k = n / 2;
+  int lo = 0, hi = n - 1;
+
+  memcpy(scratch, envelope, n * sizeof(uint16_t));
+
+  /* quickselect */
+  while (lo < hi) {
+    uint16_t pivot = scratch[(lo + hi) / 2];
+    int i = lo, j = hi;
+    while (i <= j) {
+      while (scratch[i] < pivot) i++;
+      while (scratch[j] > pivot) j--;
+      if (i <= j) {
+        uint16_t t = scratch[i];
+        scratch[i++] = scratch[j];
+        scratch[j--] = t;
+      }
+    }
+    if (k <= j) hi = j;
+    else if (k >= i) lo = i;
+    else break;
+  }
+  return scratch[k];
+}
+
+/* Detect a target: the strongest point must exceed the noise floor by
+ * DETECT_RATIO, and that must hold in CONFIRM_N of the last CONFIRM_M sweeps.
+ * No confirmed target -> distance 0, amplitude 0. */
 void find_peak(void)
 {
   int max_i = 0;
@@ -154,8 +194,19 @@ void find_peak(void)
     }
   }
 
-  peak_amplitude = max;
-  peak_distance_mm = (radar_meta.start_m + max_i * radar_meta.step_length_m) * 1000;
+  uint16_t noise = sweep_median();
+  if (noise < 1) noise = 1;
+
+  int hit = ((float)max > DETECT_RATIO * (float)noise);
+  detect_history = ((detect_history << 1) | hit) & ((1u << CONFIRM_M) - 1);
+
+  if (hit && __builtin_popcount(detect_history) >= CONFIRM_N) {
+    peak_amplitude = max;
+    peak_distance_mm = (radar_meta.start_m + max_i * radar_meta.step_length_m) * 1000;
+  } else {
+    peak_amplitude = 0;
+    peak_distance_mm = 0;
+  }
 }
 /* USER CODE END 0 */
 
