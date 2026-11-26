@@ -51,7 +51,6 @@ int main(void){
 	bt_nus_init(NULL);
 	bt_le_adv_start(BT_LE_ADV_CONN, adv_data, ARRAY_SIZE(adv_data),
 			scan_data, ARRAY_SIZE(scan_data));
-	LOG_INF("Advertising as %s", CONFIG_BT_DEVICE_NAME);
 
 	while (1) {
 		k_msgq_get(&lines, &line, K_FOREVER);

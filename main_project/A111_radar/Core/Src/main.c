@@ -45,8 +45,8 @@ typedef enum {
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define START_M 0.2f
-#define LENGTH_M 1.8f  /* 0.2 m + 1.8 m = detects out to 2.0 m */
-#define DOWNSAMPLING 4 /* ~2 mm steps keeps the 1.8 m sweep (~940 points) within MAX_LEN */
+#define LENGTH_M 1.8f  
+#define DOWNSAMPLING 4 
 #define MAX_LEN 2048
 #define LOG_LEN 1024
 /* USER CODE END PD */
@@ -95,7 +95,7 @@ int __io_putchar(int ch)
 {
   ITM_SendChar(ch);
   if (log_pos >= LOG_LEN - 1) {
-    log_pos = 0;  /* wrap so the newest messages are kept */
+    log_pos = 0;
   }
   rss_log[log_pos++] = ch;
   rss_log[log_pos] = 0;
@@ -113,7 +113,8 @@ radar_state_t radar_init(void)
 
   acc_service_requested_start_set(config, START_M);
   acc_service_requested_length_set(config, LENGTH_M);
-  acc_service_envelope_downsampling_factor_set(config, DOWNSAMPLING);  acc_service_repetition_mode_streaming_set(config, 30.0f);
+  acc_service_envelope_downsampling_factor_set(config, DOWNSAMPLING);  
+  acc_service_repetition_mode_streaming_set(config, 30.0f);
 
   radar_handle = acc_service_create(config);
   acc_service_envelope_configuration_destroy(&config);

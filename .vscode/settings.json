@@ -2,5 +2,6 @@
     "nrf-connect.applications": [
         "${workspaceFolder}\\main_project\\",
         "${workspaceFolder}\\main_project\\nrf_bluetooth\\"
-    ]
+    ],
+    "cmake.sourceDirectory": "C:/Users/chris/Documents/github/TEL320/main_project/nrf_bluetooth"
 }
